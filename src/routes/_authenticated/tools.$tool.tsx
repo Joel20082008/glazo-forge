@@ -11,9 +11,9 @@ import { PLATFORMS, SCRIPT_STYLES, TONES, TOOLS, type ToolId } from "@/lib/tools
 export const Route = createFileRoute("/_authenticated/tools/$tool")({
   head: () => ({
     meta: [
-      { title: "AI tools — ViralForge" },
+      { title: "AI tools — Glazo Forge" },
       { name: "description", content: "Generate hooks, scripts, captions, hashtags and ideas." },
-      { property: "og:title", content: "AI tools — ViralForge" },
+      { property: "og:title", content: "AI tools — Glazo Forge" },
       {
         property: "og:description",
         content: "Generate hooks, scripts, captions, hashtags and ideas.",

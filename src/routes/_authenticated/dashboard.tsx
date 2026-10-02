@@ -8,9 +8,9 @@ import { PLAN_LIMITS, TOOL_LIST } from "@/lib/tools";
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
-      { title: "Dashboard — ViralForge" },
+      { title: "Dashboard — Glazo Forge" },
       { name: "description", content: "Your content stats, recent projects and AI tools." },
-      { property: "og:title", content: "Dashboard — ViralForge" },
+      { property: "og:title", content: "Dashboard — Glazo Forge" },
       {
         property: "og:description",
         content: "Your content stats, recent projects and AI tools.",

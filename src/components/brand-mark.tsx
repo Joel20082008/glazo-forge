@@ -6,7 +6,7 @@ export function BrandMark({ to = "/" }: { to?: string }) {
       <span className="font-display grid size-8 place-items-center rounded-lg bg-accent font-bold text-accent-foreground">
         V
       </span>
-      <span className="font-display text-lg font-bold tracking-tight">ViralForge</span>
+      <span className="font-display text-lg font-bold tracking-tight">Glazo Forge</span>
     </Link>
   );
 }

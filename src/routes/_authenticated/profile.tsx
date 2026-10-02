@@ -10,12 +10,12 @@ import { PLAN_LIMITS } from "@/lib/tools";
 export const Route = createFileRoute("/_authenticated/profile")({
   head: () => ({
     meta: [
-      { title: "Profile — ViralForge" },
-      { name: "description", content: "Manage your ViralForge profile, plan and password." },
-      { property: "og:title", content: "Profile — ViralForge" },
+      { title: "Profile — Glazo Forge" },
+      { name: "description", content: "Manage your Glazo Forge profile, plan and password." },
+      { property: "og:title", content: "Profile — Glazo Forge" },
       {
         property: "og:description",
-        content: "Manage your ViralForge profile, plan and password.",
+        content: "Manage your Glazo Forge profile, plan and password.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
