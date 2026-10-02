@@ -27,6 +27,14 @@ export const TONES = [
   "Witty & Relatable",
   "Storytelling",
   "Minimalist",
+  "Bold & Confident",
+  "Friendly & Casual",
+  "Inspirational",
+  "Humorous",
+  "Luxury & Elegant",
+  "Urgent & Punchy",
+  "Warm & Empathetic",
+  "Edgy & Provocative",
 ] as const;
 
 export const PLATFORMS = [
