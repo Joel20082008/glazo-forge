@@ -49,6 +49,15 @@ export const SCRIPT_STYLES = [
   "Storytelling",
   "Educational",
   "Promotional",
+  "Tutorial / How-To",
+  "Listicle",
+  "Behind the Scenes",
+  "Day in the Life",
+  "Hot Take / Opinion",
+  "Challenge / Trend",
+  "Q&A / Myth Busting",
+  "Before & After",
+  "Vlog Style",
 ] as const;
 
 const SHARED = `You are a senior short-form social content strategist. Write in plain text only — no markdown headings, no asterisks.
