@@ -12,9 +12,9 @@ import { TOOLS, type ToolId } from "@/lib/tools";
 export const Route = createFileRoute("/_authenticated/workspace/$projectId")({
   head: () => ({
     meta: [
-      { title: "Workspace — ViralForge" },
+      { title: "Workspace — Glazo Forge" },
       { name: "description", content: "Edit, regenerate and version your generated content." },
-      { property: "og:title", content: "Workspace — ViralForge" },
+      { property: "og:title", content: "Workspace — Glazo Forge" },
       {
         property: "og:description",
         content: "Edit, regenerate and version your generated content.",

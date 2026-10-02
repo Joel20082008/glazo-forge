@@ -10,9 +10,9 @@ import { TOOLS, type ToolId } from "@/lib/tools";
 export const Route = createFileRoute("/_authenticated/library")({
   head: () => ({
     meta: [
-      { title: "Library — ViralForge" },
+      { title: "Library — Glazo Forge" },
       { name: "description", content: "Your saved hooks, scripts, captions, ideas and projects." },
-      { property: "og:title", content: "Library — ViralForge" },
+      { property: "og:title", content: "Library — Glazo Forge" },
       {
         property: "og:description",
         content: "Your saved hooks, scripts, captions, ideas and projects.",

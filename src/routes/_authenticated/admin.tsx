@@ -9,9 +9,9 @@ import { TOOLS, type ToolId } from "@/lib/tools";
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
     meta: [
-      { title: "Admin — ViralForge" },
+      { title: "Admin — Glazo Forge" },
       { name: "description", content: "Platform usage, subscriptions and generation stats." },
-      { property: "og:title", content: "Admin — ViralForge" },
+      { property: "og:title", content: "Admin — Glazo Forge" },
       {
         property: "og:description",
         content: "Platform usage, subscriptions and generation stats.",

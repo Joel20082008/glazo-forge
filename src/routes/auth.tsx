@@ -11,10 +11,10 @@ export const Route = createFileRoute("/auth")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Sign in — ViralForge" },
-      { name: "description", content: "Sign in or create your ViralForge account." },
-      { property: "og:title", content: "Sign in — ViralForge" },
-      { property: "og:description", content: "Sign in or create your ViralForge account." },
+      { title: "Sign in — Glazo Forge" },
+      { name: "description", content: "Sign in or create your Glazo Forge account." },
+      { property: "og:title", content: "Sign in — Glazo Forge" },
+      { property: "og:description", content: "Sign in or create your Glazo Forge account." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

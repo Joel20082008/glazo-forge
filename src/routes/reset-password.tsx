@@ -10,12 +10,12 @@ export const Route = createFileRoute("/reset-password")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Set a new password — ViralForge" },
-      { name: "description", content: "Choose a new password for your ViralForge account." },
-      { property: "og:title", content: "Set a new password — ViralForge" },
+      { title: "Set a new password — Glazo Forge" },
+      { name: "description", content: "Choose a new password for your Glazo Forge account." },
+      { property: "og:title", content: "Set a new password — Glazo Forge" },
       {
         property: "og:description",
-        content: "Choose a new password for your ViralForge account.",
+        content: "Choose a new password for your Glazo Forge account.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

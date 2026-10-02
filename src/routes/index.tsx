@@ -7,13 +7,13 @@ import { TOOL_LIST } from "@/lib/tools";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "ViralForge — Forge ideas into content that gets attention" },
+      { title: "Glazo Forge — Forge ideas into content that gets attention" },
       {
         name: "description",
         content:
           "AI hooks, scripts, captions and hashtags for TikTok, Reels, Shorts and X. Turn one idea into a week of content.",
       },
-      { property: "og:title", content: "ViralForge — AI content studio for short-form creators" },
+      { property: "og:title", content: "Glazo Forge — AI content studio for short-form creators" },
       {
         property: "og:description",
         content:
@@ -105,7 +105,7 @@ function Landing() {
         </section>
 
         <footer className="mt-12 flex items-center justify-between border-t border-border pt-5">
-          <span className="font-display text-sm font-semibold">ViralForge</span>
+          <span className="font-display text-sm font-semibold">Glazo Forge</span>
           <span className="text-[11px] text-muted-foreground">Forge · Shape · Post</span>
         </footer>
       </div>
