@@ -25,6 +25,12 @@ export async function runAiText(messages: ModelMessage[]): Promise<string> {
     throw new AiConfigurationError("AI provider is not configured.");
   }
 
+  const system = messages
+    .filter((m) => m.role === "system")
+    .map((m) => (typeof m.content === "string" ? m.content : ""))
+    .join("\n\n");
+  const rest = messages.filter((m) => m.role !== "system");
+
   const runIdFetch = createLovableAiGatewayRunIdFetch();
   const provider = createOpenAI({
     baseURL: GATEWAY_BASE_URL,
@@ -40,7 +46,8 @@ export async function runAiText(messages: ModelMessage[]): Promise<string> {
   try {
     const result = streamText({
       model: provider.responses(MODEL),
-      messages,
+      ...(system ? { instructions: system } : {}),
+      messages: rest,
       onError: ({ error }) => {
         streamError = error;
         console.error("AI stream error", error);
