@@ -36,10 +36,15 @@ export async function runAiText(messages: ModelMessage[]): Promise<string> {
     fetch: runIdFetch.fetch,
   });
 
+  let streamError: unknown = null;
   try {
     const result = streamText({
       model: provider.responses(MODEL),
       messages,
+      onError: ({ error }) => {
+        streamError = error;
+        console.error("AI stream error", error);
+      },
       providerOptions: {
         openai: {
           forceReasoning: true,
@@ -50,8 +55,11 @@ export async function runAiText(messages: ModelMessage[]): Promise<string> {
         },
       },
     });
-    return await result.text;
-  } catch (error) {
+    const text = await result.text;
+    if (streamError) throw streamError;
+    return text;
+  } catch (caught) {
+    const error = streamError ?? caught;
     const status =
       typeof error === "object" && error !== null && "statusCode" in error
         ? Number((error as { statusCode: unknown }).statusCode)
