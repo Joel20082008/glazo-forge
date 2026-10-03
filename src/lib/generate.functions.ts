@@ -20,7 +20,23 @@ const inputSchema = z.object({
   audience: z.string().max(200).optional(),
   style: z.string().max(60).optional(),
   location: z.string().max(100).optional(),
+  duration: z.string().max(30).optional(),
+  hookStyle: z.string().max(40).optional(),
+  ctaGoal: z.string().max(40).optional(),
+  revise: z
+    .object({
+      action: z.enum(["regenerate", "shorten", "energetic", "style"]),
+      script: z.string().min(3).max(8000),
+    })
+    .optional(),
 });
+
+const REVISE_INSTRUCTIONS: Record<string, string> = {
+  regenerate: "Write one fresh alternative to this script with a different angle and opening.",
+  shorten: "Rewrite this script to be noticeably shorter and tighter (about 30 seconds), rewriting naturally rather than cutting sentences.",
+  energetic: "Rewrite this script to be more energetic: punchier opening, faster pacing, stronger verbs.",
+  style: "Rewrite this script in the requested script style while keeping the topic.",
+};
 
 export type GenerateResult =
   | { status: "ok"; blocks: string[]; raw: string; usedThisMonth: number }
@@ -76,16 +92,24 @@ export const generateContent = createServerFn({ method: "POST" })
       data.style ? `Script style: ${data.style}` : null,
       data.audience ? `Audience: ${data.audience}` : null,
       data.location ? `Target location: ${data.location}` : null,
+      data.duration ? `Duration: ${data.duration}` : null,
+      data.hookStyle ? `Hook style: ${data.hookStyle}` : null,
+      data.ctaGoal ? `CTA goal: ${data.ctaGoal}` : null,
     ]
       .filter(Boolean)
       .join("\n");
 
     try {
       const raw = await runAiText([
-        { role: "system", content: tool.system },
+        {
+          role: "system",
+          content: data.revise
+            ? `${tool.system}\n\nREVISION MODE: produce exactly ONE result block (no --- separators). ${REVISE_INSTRUCTIONS[data.revise.action]}`
+            : tool.system,
+        },
         {
           role: "user",
-          content: `${details ? `${details}\n\n` : ""}Input:\n${data.input}`,
+          content: `${details ? `${details}\n\n` : ""}Input:\n${data.input}${data.revise ? `\n\nScript to revise:\n${data.revise.script}` : ""}`,
         },
       ]);
 
