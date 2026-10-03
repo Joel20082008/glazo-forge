@@ -19,6 +19,7 @@ const inputSchema = z.object({
   platform: z.string().max(60).optional(),
   audience: z.string().max(200).optional(),
   style: z.string().max(60).optional(),
+  location: z.string().max(100).optional(),
 });
 
 export type GenerateResult =
@@ -74,6 +75,7 @@ export const generateContent = createServerFn({ method: "POST" })
       data.tone ? `Tone: ${data.tone}` : null,
       data.style ? `Script style: ${data.style}` : null,
       data.audience ? `Audience: ${data.audience}` : null,
+      data.location ? `Target location: ${data.location}` : null,
     ]
       .filter(Boolean)
       .join("\n");

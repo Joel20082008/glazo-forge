@@ -43,6 +43,7 @@ export const PLATFORMS = [
   "YouTube Shorts",
   "X",
   "LinkedIn",
+  "Facebook",
 ] as const;
 
 export const SCRIPT_STYLES = [

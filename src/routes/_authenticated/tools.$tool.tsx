@@ -37,6 +37,7 @@ function ToolPage() {
   const [platform, setPlatform] = useState<string>(PLATFORMS[0]);
   const [style, setStyle] = useState<string>(SCRIPT_STYLES[0]);
   const [audience, setAudience] = useState("");
+  const [location, setLocation] = useState("");
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<GenerateResult | null>(null);
 
@@ -55,7 +56,8 @@ function ToolPage() {
           tone,
           ...(tool.platform ? { platform } : {}),
           ...(tool.id === "script" ? { style } : {}),
-          ...(tool.id === "ideas" && audience ? { audience } : {}),
+          ...((tool.id === "ideas" || tool.id === "hashtag") && audience.trim() ? { audience: audience.trim() } : {}),
+          ...(tool.id === "hashtag" && location.trim() ? { location: location.trim() } : {}),
         },
       });
       setResult(res);
@@ -152,6 +154,23 @@ function ToolPage() {
         </p>
         <Chips options={[...TONES]} value={tone} onChange={setTone} />
 
+        {tool.id === "hashtag" ? (
+          <>
+            <input
+              value={audience}
+              onChange={(e) => setAudience(e.target.value)}
+              placeholder="Target audience (optional, e.g. student creators)"
+              className="mt-4 w-full rounded-xl border border-input bg-background/60 px-3 py-2.5 text-sm outline-none focus:border-accent/60"
+            />
+            <input
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              placeholder="Location (optional, e.g. Lagos, Nigeria)"
+              className="mt-2 w-full rounded-xl border border-input bg-background/60 px-3 py-2.5 text-sm outline-none focus:border-accent/60"
+            />
+          </>
+        ) : null}
+
         {tool.id === "ideas" ? (
           <input
             value={audience}
@@ -188,7 +207,7 @@ function ToolPage() {
               Results
             </h2>
             <span className="text-[11px] text-muted-foreground">
-              {result.blocks.length} variations
+              {result.blocks.length} {tool.id === "hashtag" ? "sections" : "variations"}
             </span>
           </div>
           <div className="space-y-3">
@@ -199,7 +218,7 @@ function ToolPage() {
                 style={{ animationDelay: `${index * 60}ms` }}
               >
                 <p className="text-[11px] font-medium text-accent">
-                  Variation {String(index + 1).padStart(2, "0")}
+                  {tool.id === "hashtag" ? "Section" : "Variation"} {String(index + 1).padStart(2, "0")}
                 </p>
                 <p className="mt-2 text-sm leading-relaxed whitespace-pre-wrap">{block}</p>
                 <div className="mt-3 flex flex-wrap gap-2">
