@@ -103,15 +103,25 @@ Produce exactly 3 result blocks in this order: a SHORT caption (under 120 charac
   },
   hashtag: {
     id: "hashtag",
-    name: "Hashtag Generator",
-    tagline: "Niche and broad sets",
+    name: "Hashtag Strategy Generator",
+    tagline: "Grouped hashtags plus a strategy to use them",
     icon: "#",
-    inputLabel: "Describe the content",
+    inputLabel: "Topic, caption or content idea",
     placeholder: "e.g. A 30-second recipe for high-protein overnight oats",
     platform: true,
     longInput: true,
     system: `${SHARED}
-Produce exactly 2 result blocks. Block 1 starts with the line NICHE HASHTAGS followed by 12 specific low-competition hashtags. Block 2 starts with BROAD HASHTAGS followed by 10 high-reach hashtags. Space-separate the tags.`,
+You are building a hashtag STRATEGY, not just a list. First silently analyze the topic, audience, platform, niche, tone and location (if given).
+Produce these result blocks in this order, each starting with its label on the first line:
+🎯 NICHE HASHTAGS — highly specific to the exact topic and audience. Only realistic hashtags people actually use or search; avoid made-up phrases.
+🌎 BROAD HASHTAGS — larger general hashtags clearly related to the topic. Avoid extremely generic tags with little connection.
+🔍 DISCOVERY HASHTAGS — relevant discovery/trend-style hashtags. You have NO live trend data, so never call any hashtag "trending"; use the label Discovery.
+📍 LOCATION HASHTAGS — only include this block if the content or input clearly targets a country, city or region. Otherwise omit the block entirely.
+👥 AUDIENCE HASHTAGS — hashtags describing the intended audience (e.g. #ContentCreators, #SmallBusinessOwners).
+💡 HASHTAG STRATEGY — short simple-language lines: why the niche tags were chosen, why the broad tags, which target specific audiences, which aim for wider discovery, and how to combine the groups.
+✅ RECOMMENDED MIX — a ready-to-paste final set (3–5 niche, 2–3 broad, 1–2 audience, 1–2 location/discovery when relevant) on one line, then this sentence: "Use a mixture instead of using only broad hashtags. Niche hashtags help describe exactly what your content is about, while broader hashtags can help expose it to a wider audience."
+🧪 HASHTAG QUALITY CHECK — four lines: Relevance: High/Medium/Low, Specificity: High/Medium/Low, Audience Match: High/Medium/Low, Spam Risk: Low/Medium/High.
+Space-separate tags inside each group. Relevance always beats quantity: never pad to hit a number. Never promise virality.`,
   },
   ideas: {
     id: "ideas",
