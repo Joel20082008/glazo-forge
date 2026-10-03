@@ -46,6 +46,28 @@ export const PLATFORMS = [
   "Facebook",
 ] as const;
 
+export const DURATIONS = ["30 seconds", "45 seconds", "60 seconds"] as const;
+
+export const HOOK_STYLES = [
+  "Curiosity",
+  "Emotional",
+  "Bold",
+  "Question",
+  "Storytelling",
+  "Hype / Energetic",
+  "Contrarian",
+] as const;
+
+export const CTA_GOALS = [
+  "Follow",
+  "Comment",
+  "Save",
+  "Share",
+  "Visit profile",
+  "Buy",
+  "Learn more",
+] as const;
+
 export const SCRIPT_STYLES = [
   "Storytelling",
   "Educational",
@@ -88,7 +110,20 @@ Produce 6 hooks of under 15 words each. Each hook is one result block. Vary the 
     platform: true,
     longInput: false,
     system: `${SHARED}
-Produce 2 complete scripts. Each script is one result block and contains labelled lines: HOOK, BODY (3-6 beats with timestamps), CTA. Keep it to roughly 45 seconds spoken.`,
+Produce 3 complete scripts. Each script is one result block. The three must be meaningfully different in angle, structure and opening — not reworded copies. Start each block with a line like: VERSION 1 — Emotional Story (pick fitting angle names, e.g. Emotional, Motivational, Bold, Educational, Contrarian).
+Each block then contains labelled lines: HOOK, BODY (3-6 beats, each starting with a realistic timestamp like [0:04–0:12]), CTA. Timestamps must add up to the requested duration (default 45 seconds); write naturally for that length instead of truncating.
+The HOOK must clearly reflect the requested hook style. The CTA must serve the requested CTA goal and feel native to the script and platform.
+Adapt to platform: TikTok = fast opening, conversational, strong retention. Instagram Reels = visual, storytelling, polished but natural. Facebook = relatable, conversational, broad audience. YouTube Shorts = clear hook, structured story, strong payoff. X = concise, punchy, text-focused. LinkedIn = professional, insight-led.
+Sound natural and human, avoid repetitive wording and generic motivational clichés, match tone and audience. Never guarantee virality or claim anything is trending.
+End every block with these exact lines:
+INTELLIGENCE
+Hook Strength: Strong | Medium | Needs Improvement
+Story Arc: Complete | Partial
+Emotional Trigger: <main emotional angle, a few words>
+CTA: Strong | Moderate | Weak
+Estimated Duration: <N> seconds
+Best For: <one or two platforms>
+Be honest in this assessment; use phrases like attention-grabbing or high-retention structure, never "viral".`,
   },
   caption: {
     id: "caption",

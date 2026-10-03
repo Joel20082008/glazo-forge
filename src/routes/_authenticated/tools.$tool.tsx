@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { AppShell } from "@/components/app-shell";
 import { supabase } from "@/integrations/supabase/client";
 import { generateContent, type GenerateResult } from "@/lib/generate.functions";
-import { PLATFORMS, SCRIPT_STYLES, TONES, TOOLS, type ToolId } from "@/lib/tools";
+import { CTA_GOALS, DURATIONS, HOOK_STYLES, PLATFORMS, SCRIPT_STYLES, TONES, TOOLS, type ToolId } from "@/lib/tools";
 
 export const Route = createFileRoute("/_authenticated/tools/$tool")({
   head: () => ({
@@ -38,8 +38,46 @@ function ToolPage() {
   const [style, setStyle] = useState<string>(SCRIPT_STYLES[0]);
   const [audience, setAudience] = useState("");
   const [location, setLocation] = useState("");
+  const [duration, setDuration] = useState<string>(DURATIONS[1]);
+  const [hookStyle, setHookStyle] = useState<string>(HOOK_STYLES[0]);
+  const [ctaGoal, setCtaGoal] = useState<string>(CTA_GOALS[0]);
+  const [revising, setRevising] = useState<number | null>(null);
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<GenerateResult | null>(null);
+
+  function baseData() {
+    return {
+      tool: tool.id,
+      input: input.trim(),
+      tone,
+      ...(tool.platform ? { platform } : {}),
+      ...(tool.id === "script" ? { style, duration, hookStyle, ctaGoal } : {}),
+      ...((tool.id === "ideas" || tool.id === "hashtag") && audience.trim() ? { audience: audience.trim() } : {}),
+      ...(tool.id === "hashtag" && location.trim() ? { location: location.trim() } : {}),
+    };
+  }
+
+  async function revise(index: number, action: "regenerate" | "shorten" | "energetic" | "style") {
+    if (result?.status !== "ok") return;
+    const script = result.blocks[index];
+    if (!script) return;
+    setRevising(index);
+    try {
+      const res = await run({ data: { ...baseData(), revise: { action, script } } });
+      if (res.status === "ok") {
+        const next = res.blocks.join("\n\n");
+        setResult((prev) =>
+          prev?.status === "ok"
+            ? { ...prev, usedThisMonth: res.usedThisMonth, blocks: prev.blocks.map((b, i) => (i === index ? next : b)) }
+            : prev,
+        );
+      } else toast.error(res.message);
+    } catch {
+      toast.error("Could not update the script. Please try again.");
+    } finally {
+      setRevising(null);
+    }
+  }
 
   async function onGenerate() {
     if (input.trim().length < 3) {
@@ -49,17 +87,7 @@ function ToolPage() {
     setBusy(true);
     setResult(null);
     try {
-      const res = await run({
-        data: {
-          tool: tool.id,
-          input: input.trim(),
-          tone,
-          ...(tool.platform ? { platform } : {}),
-          ...(tool.id === "script" ? { style } : {}),
-          ...((tool.id === "ideas" || tool.id === "hashtag") && audience.trim() ? { audience: audience.trim() } : {}),
-          ...(tool.id === "hashtag" && location.trim() ? { location: location.trim() } : {}),
-        },
-      });
+      const res = await run({ data: baseData() });
       setResult(res);
       if (res.status === "error") toast.error(res.message);
     } catch {
@@ -146,6 +174,12 @@ function ToolPage() {
               Script style
             </p>
             <Chips options={[...SCRIPT_STYLES]} value={style} onChange={setStyle} />
+            <Label>Duration</Label>
+            <Chips options={[...DURATIONS]} value={duration} onChange={setDuration} />
+            <Label>Hook style</Label>
+            <Chips options={[...HOOK_STYLES]} value={hookStyle} onChange={setHookStyle} />
+            <Label>CTA goal</Label>
+            <Chips options={[...CTA_GOALS]} value={ctaGoal} onChange={setCtaGoal} />
           </>
         ) : null}
 
@@ -220,7 +254,19 @@ function ToolPage() {
                 <p className="text-[11px] font-medium text-accent">
                   {tool.id === "hashtag" ? "Section" : "Variation"} {String(index + 1).padStart(2, "0")}
                 </p>
-                <p className="mt-2 text-sm leading-relaxed whitespace-pre-wrap">{block}</p>
+                {tool.id === "script" ? (
+                  <ScriptBlock block={block} busy={revising === index} />
+                ) : (
+                  <p className="mt-2 text-sm leading-relaxed whitespace-pre-wrap">{block}</p>
+                )}
+                {tool.id === "script" ? (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <SmallButton onClick={() => revise(index, "regenerate")}>🔄 Regenerate</SmallButton>
+                    <SmallButton onClick={() => revise(index, "shorten")}>✂️ Shorten</SmallButton>
+                    <SmallButton onClick={() => revise(index, "energetic")}>🔥 More energetic</SmallButton>
+                    <SmallButton onClick={() => revise(index, "style")}>🎭 Use “{style}” style</SmallButton>
+                  </div>
+                ) : null}
                 <div className="mt-3 flex flex-wrap gap-2">
                   <SmallButton
                     onClick={() => {
@@ -228,7 +274,7 @@ function ToolPage() {
                       toast.success("Copied");
                     }}
                   >
-                    Copy
+                    {tool.id === "script" ? "📋 Copy" : "Copy"}
                   </SmallButton>
                   <SmallButton onClick={() => saveToLibrary(block)}>Save</SmallButton>
                   <SmallButton onClick={() => openInWorkspace(block)}>Open in workspace</SmallButton>
@@ -292,6 +338,55 @@ function Notice({ tag, body }: { tag: string; body: string }) {
     <div className="mt-5 rounded-2xl border border-accent/30 bg-accent/10 p-4">
       <p className="text-[10px] font-bold tracking-[0.14em] text-accent">{tag}</p>
       <p className="mt-1 text-[13px] text-foreground/80">{body}</p>
+    </div>
+  );
+}
+
+function Label({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="mt-4 text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase">
+      {children}
+    </p>
+  );
+}
+
+const INTEL_ICONS: Record<string, string> = {
+  "hook strength": "🎯",
+  "story arc": "📖",
+  "emotional trigger": "❤️",
+  cta: "⚡",
+  "estimated duration": "⏱️",
+  "best for": "📱",
+};
+
+function ScriptBlock({ block, busy }: { block: string; busy: boolean }) {
+  const parts = block.split(/^\s*INTELLIGENCE\s*$/m);
+  const script = (parts[0] ?? "").trim();
+  const intel = (parts[1] ?? "")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line.includes(":"))
+    .map((line) => {
+      const i = line.indexOf(":");
+      return { key: line.slice(0, i).trim(), value: line.slice(i + 1).trim() };
+    })
+    .filter((row) => INTEL_ICONS[row.key.toLowerCase()]);
+  return (
+    <div className={busy ? "animate-pulse opacity-60" : undefined}>
+      <p className="mt-2 text-sm leading-relaxed whitespace-pre-wrap">{script}</p>
+      {intel.length ? (
+        <div className="mt-3 grid grid-cols-2 gap-2 rounded-xl border border-border bg-foreground/5 p-3">
+          <p className="col-span-2 text-[10px] font-bold tracking-[0.14em] text-accent">SCRIPT INTELLIGENCE</p>
+          {intel.map((row) => (
+            <div key={row.key} className="min-w-0">
+              <p className="text-[10px] text-muted-foreground">
+                {INTEL_ICONS[row.key.toLowerCase()]} {row.key}
+              </p>
+              <p className="truncate text-[12px] font-medium">{row.value}</p>
+            </div>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }
