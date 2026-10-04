@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { AppShell } from "@/components/app-shell";
 import { supabase } from "@/integrations/supabase/client";
 import { generateContent, type GenerateResult } from "@/lib/generate.functions";
-import { CTA_GOALS, DURATIONS, HOOK_STYLES, PLATFORMS, SCRIPT_STYLES, TONES, TOOLS, type ToolId } from "@/lib/tools";
+import { CAPTION_TONE_SHIFTS, CTA_GOALS, DURATIONS, HOOK_STYLES, PLATFORMS, SCRIPT_STYLES, TONES, TOOLS, type ToolId } from "@/lib/tools";
 
 export const Route = createFileRoute("/_authenticated/tools/$tool")({
   head: () => ({
@@ -42,6 +42,9 @@ function ToolPage() {
   const [hookStyle, setHookStyle] = useState<string>(HOOK_STYLES[0]);
   const [ctaGoal, setCtaGoal] = useState<string>(CTA_GOALS[0]);
   const [revising, setRevising] = useState<number | null>(null);
+  const [toneMenu, setToneMenu] = useState<number | null>(null);
+  const [hashtags, setHashtags] = useState<string[] | null>(null);
+  const [hashBusy, setHashBusy] = useState(false);
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<GenerateResult | null>(null);
 
@@ -57,13 +60,38 @@ function ToolPage() {
     };
   }
 
-  async function revise(index: number, action: "regenerate" | "shorten" | "energetic" | "style") {
+  async function addHashtags() {
+    setHashBusy(true);
+    try {
+      const res = await run({
+        data: {
+          tool: "hashtag",
+          input: input.trim(),
+          tone,
+          ...(tool.platform ? { platform } : {}),
+        },
+      });
+      if (res.status === "ok") setHashtags(res.blocks);
+      else toast.error(res.message);
+    } catch {
+      toast.error("Could not generate hashtags.");
+    } finally {
+      setHashBusy(false);
+    }
+  }
+
+  async function revise(
+    index: number,
+    action: "regenerate" | "shorten" | "energetic" | "style" | "expand" | "tone",
+    targetTone?: string,
+  ) {
+    setToneMenu(null);
     if (result?.status !== "ok") return;
     const script = result.blocks[index];
     if (!script) return;
     setRevising(index);
     try {
-      const res = await run({ data: { ...baseData(), revise: { action, script } } });
+      const res = await run({ data: { ...baseData(), revise: { action, script, ...(targetTone ? { targetTone } : {}) } } });
       if (res.status === "ok") {
         const next = res.blocks.join("\n\n");
         setResult((prev) =>
@@ -86,6 +114,7 @@ function ToolPage() {
     }
     setBusy(true);
     setResult(null);
+    setHashtags(null);
     try {
       const res = await run({ data: baseData() });
       setResult(res);
@@ -245,17 +274,21 @@ function ToolPage() {
             </span>
           </div>
           <div className="space-y-3">
-            {result.blocks.map((block, index) => (
+            {result.blocks.map((block, index) => {
+              const hasIntel = tool.id === "script" || tool.id === "caption";
+              const isCta = tool.id === "caption" && /^\s*CTA/i.test(block);
+              const copyText = hasIntel ? splitIntel(block).text : block;
+              return (
               <article
                 key={index}
                 className="glass animate-rise rounded-2xl p-4"
                 style={{ animationDelay: `${index * 60}ms` }}
               >
                 <p className="text-[11px] font-medium text-accent">
-                  {tool.id === "hashtag" ? "Section" : "Variation"} {String(index + 1).padStart(2, "0")}
+                  {tool.id === "hashtag" || tool.id === "caption" ? "Section" : "Variation"} {String(index + 1).padStart(2, "0")}
                 </p>
-                {tool.id === "script" ? (
-                  <ScriptBlock block={block} busy={revising === index} />
+                {hasIntel ? (
+                  <IntelBlock block={block} busy={revising === index} kind={tool.id} />
                 ) : (
                   <p className="mt-2 text-sm leading-relaxed whitespace-pre-wrap">{block}</p>
                 )}
@@ -267,20 +300,72 @@ function ToolPage() {
                     <SmallButton onClick={() => revise(index, "style")}>🎭 Use “{style}” style</SmallButton>
                   </div>
                 ) : null}
+                {tool.id === "caption" && !isCta ? (
+                  <>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <SmallButton onClick={() => revise(index, "regenerate")}>🔄 Regenerate</SmallButton>
+                      <SmallButton onClick={() => revise(index, "shorten")}>✂️ Shorten</SmallButton>
+                      <SmallButton onClick={() => revise(index, "expand")}>➕ Expand</SmallButton>
+                      <SmallButton onClick={() => setToneMenu(toneMenu === index ? null : index)}>
+                        🔥 Change tone
+                      </SmallButton>
+                    </div>
+                    {toneMenu === index ? (
+                      <div className="mt-2 flex flex-wrap gap-2 rounded-xl border border-border bg-foreground/5 p-2">
+                        {CAPTION_TONE_SHIFTS.map((shift) => (
+                          <SmallButton key={shift.label} onClick={() => revise(index, "tone", shift.tone)}>
+                            {shift.label}
+                          </SmallButton>
+                        ))}
+                      </div>
+                    ) : null}
+                  </>
+                ) : null}
                 <div className="mt-3 flex flex-wrap gap-2">
                   <SmallButton
                     onClick={() => {
-                      void navigator.clipboard.writeText(block);
+                      void navigator.clipboard.writeText(copyText);
                       toast.success("Copied");
                     }}
                   >
-                    {tool.id === "script" ? "📋 Copy" : "Copy"}
+                    {hasIntel ? "📋 Copy" : "Copy"}
                   </SmallButton>
-                  <SmallButton onClick={() => saveToLibrary(block)}>Save</SmallButton>
-                  <SmallButton onClick={() => openInWorkspace(block)}>Open in workspace</SmallButton>
+                  <SmallButton onClick={() => saveToLibrary(copyText)}>Save</SmallButton>
+                  <SmallButton onClick={() => openInWorkspace(copyText)}>Open in workspace</SmallButton>
                 </div>
               </article>
-            ))}
+              );
+            })}
+            {tool.id === "caption" ? (
+              hashtags ? (
+                <article className="glass rounded-2xl p-4">
+                  <p className="text-[11px] font-medium text-accent">#️⃣ Hashtags (separate from your caption)</p>
+                  {hashtags.map((h, i) => (
+                    <div key={i} className="mt-3 border-t border-border pt-3 first:border-0 first:pt-0">
+                      <p className="text-sm leading-relaxed whitespace-pre-wrap">{h}</p>
+                      <div className="mt-2">
+                        <SmallButton
+                          onClick={() => {
+                            void navigator.clipboard.writeText(h);
+                            toast.success("Copied");
+                          }}
+                        >
+                          📋 Copy
+                        </SmallButton>
+                      </div>
+                    </div>
+                  ))}
+                </article>
+              ) : (
+                <button
+                  onClick={addHashtags}
+                  disabled={hashBusy}
+                  className="w-full rounded-xl border border-accent/40 bg-accent/10 py-3 text-sm font-semibold text-accent disabled:opacity-60"
+                >
+                  {hashBusy ? "Building hashtag strategy…" : "#️⃣ Add hashtags"}
+                </button>
+              )
+            ) : null}
           </div>
         </section>
       ) : null}
@@ -357,12 +442,17 @@ const INTEL_ICONS: Record<string, string> = {
   cta: "⚡",
   "estimated duration": "⏱️",
   "best for": "📱",
+  hook: "🎯",
+  readability: "👀",
+  "emotional angle": "❤️",
+  "cta strength": "⚡",
+  "platform fit": "📱",
+  "reading time": "⏱️",
 };
 
-function ScriptBlock({ block, busy }: { block: string; busy: boolean }) {
+function splitIntel(block: string) {
   const parts = block.split(/^\s*INTELLIGENCE\s*$/m);
-  const script = (parts[0] ?? "").trim();
-  const intel = (parts[1] ?? "")
+  const rows = (parts[1] ?? "")
     .split("\n")
     .map((line) => line.trim())
     .filter((line) => line.includes(":"))
@@ -371,18 +461,36 @@ function ScriptBlock({ block, busy }: { block: string; busy: boolean }) {
       return { key: line.slice(0, i).trim(), value: line.slice(i + 1).trim() };
     })
     .filter((row) => INTEL_ICONS[row.key.toLowerCase()]);
+  return { text: (parts[0] ?? "").trim(), rows };
+}
+
+function IntelBlock({ block, busy, kind }: { block: string; busy: boolean; kind: string }) {
+  const { text, rows } = splitIntel(block);
   return (
     <div className={busy ? "animate-pulse opacity-60" : undefined}>
-      <p className="mt-2 text-sm leading-relaxed whitespace-pre-wrap">{script}</p>
-      {intel.length ? (
+      <p className="mt-2 text-sm leading-relaxed whitespace-pre-wrap">{text}</p>
+      {rows.length ? (
         <div className="mt-3 grid grid-cols-2 gap-2 rounded-xl border border-border bg-foreground/5 p-3">
-          <p className="col-span-2 text-[10px] font-bold tracking-[0.14em] text-accent">SCRIPT INTELLIGENCE</p>
-          {intel.map((row) => (
-            <div key={row.key} className="min-w-0">
+          <p className="col-span-2 text-[10px] font-bold tracking-[0.14em] text-accent">
+            {kind === "caption" ? "📊 CAPTION INTELLIGENCE" : "SCRIPT INTELLIGENCE"}
+          </p>
+          {rows.map((row) => (
+            <div
+              key={row.key}
+              className={row.key.toLowerCase() === "platform fit" ? "col-span-2 min-w-0" : "min-w-0"}
+            >
               <p className="text-[10px] text-muted-foreground">
                 {INTEL_ICONS[row.key.toLowerCase()]} {row.key}
               </p>
-              <p className="truncate text-[12px] font-medium">{row.value}</p>
+              <p
+                className={
+                  row.key.toLowerCase() === "platform fit"
+                    ? "text-[12px] font-medium"
+                    : "truncate text-[12px] font-medium"
+                }
+              >
+                {row.value}
+              </p>
             </div>
           ))}
         </div>
