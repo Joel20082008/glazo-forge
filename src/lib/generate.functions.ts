@@ -107,7 +107,7 @@ export const generateContent = createServerFn({ method: "POST" })
         {
           role: "system",
           content: data.revise
-            ? `${tool.system}\n\nREVISION MODE: produce exactly ONE result block (no --- separators). ${REVISE_INSTRUCTIONS[data.revise.action]} Keep the same block label and the INTELLIGENCE lines (updated).${data.revise.targetTone ? ` Target tone: ${data.revise.targetTone}.` : ""}`
+            ? `${tool.system}\n\nREVISION MODE: produce exactly ONE result block (no --- separators). ${REVISE_INSTRUCTIONS[data.revise.action]} ${data.tool === "improve" ? "Return the complete IMPROVED VERSION, IMPROVEMENT REPORT and EXPLAIN CHANGES sections, updating the report against the original input and explaining this revision. For 'shorten', make it distinctly shorter without losing the key point. For 'energetic' or 'tone', make the style change noticeable while retaining accuracy." : "Keep the same block label and the INTELLIGENCE lines (updated)."}${data.revise.targetTone ? ` Target tone: ${data.revise.targetTone}.` : ""}`
             : tool.system,
         },
         {

@@ -215,7 +215,19 @@ Produce exactly 5 result blocks, each starting with its platform label on the fi
     platform: true,
     longInput: true,
     system: `${SHARED}
-Produce exactly 2 result blocks. Block 1 starts with IMPROVED VERSION and contains the rewritten content with a stronger hook, tighter structure and a clear CTA. Block 2 starts with WHAT CHANGED and lists 4 bullet-free short lines covering hook, structure, clarity, CTA and engagement potential.`,
+Produce exactly ONE result block using the following format, with no --- separator:
+IMPROVED VERSION
+<only the rewritten, ready-to-publish content; no commentary or report here>
+IMPROVEMENT REPORT
+Hook: <short, specific description of what changed or what remains weak>
+Clarity: <short, specific assessment>
+Structure: <short, specific assessment>
+CTA: <short, specific assessment; if a CTA is inappropriate, say so>
+Overall Improvement: <one sentence comparing the original and rewrite, without invented performance claims>
+EXPLAIN CHANGES
+- <specific change made>
+- <specific change made>
+Add 2–4 short bullet points under EXPLAIN CHANGES; no other sections. Preserve the original meaning and factual claims. Improve the opening, clarity, flow and CTA where appropriate without fabricating facts. Match the selected platform's native length and format: TikTok, Instagram Reels and YouTube Shorts should read naturally as short-form video copy; X should be concise; LinkedIn professional and insight-led; Facebook conversational and relatable. Match the selected tone. Sound human, avoid clich e9s and unnecessary emojis. Never guarantee virality, views or engagement. The report assesses the writing, not predicted performance.`,
   },
 };
 
