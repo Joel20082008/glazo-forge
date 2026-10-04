@@ -68,6 +68,16 @@ export const CTA_GOALS = [
   "Learn more",
 ] as const;
 
+export const CAPTION_TONE_SHIFTS = [
+  { label: "🔥 More Hype", tone: "hype and energetic" },
+  { label: "❤️ More Emotional", tone: "emotional and heartfelt" },
+  { label: "😂 More Casual", tone: "casual, light and funny" },
+  { label: "💼 More Professional", tone: "professional and polished" },
+  { label: "✨ More Inspirational", tone: "inspirational" },
+  { label: "🧠 More Educational", tone: "educational and informative" },
+  { label: "😎 More Bold", tone: "bold and confident" },
+] as const;
+
 export const SCRIPT_STYLES = [
   "Storytelling",
   "Educational",
@@ -135,7 +145,19 @@ Be honest in this assessment; use phrases like attention-grabbing or high-retent
     platform: true,
     longInput: false,
     system: `${SHARED}
-Produce exactly 3 result blocks in this order: a SHORT caption (under 120 characters), a LONG caption (3 short paragraphs), and a CTA SUGGESTIONS block with 5 calls to action. Start each block with its label on the first line.`,
+Produce result blocks in this order, each starting with its label alone on the first line: SHORT (concise, quick to read), LONG (developed caption with story, emotion and context), MICRO (one strong sentence), STORY (personal, conversational version), then CTA SUGGESTIONS.
+Adapt to platform: Instagram Reels = conversational, visual-friendly, concise. TikTok = fast, casual, attention-focused. Facebook = relatable, conversational. YouTube Shorts = works as a video description. X = short, punchy, discussion-friendly. LinkedIn = professional, insight-led.
+Sound natural and human, avoid repetitive AI-style wording, avoid unnecessary emojis and generic clichés, match tone, topic and audience. Never guarantee engagement or virality. Do not include hashtags.
+End each of SHORT, LONG, MICRO and STORY with these exact lines:
+INTELLIGENCE
+Hook: Strong | Medium | Needs Improvement
+Readability: Easy | Moderate | Difficult
+Emotional Angle: <main emotion, a few words>
+CTA Strength: Strong | Medium | Weak
+Platform Fit: <one short sentence on why it fits the platform>
+Reading Time: <N> seconds
+These are structural assessments, not engagement predictions.
+The CTA SUGGESTIONS block groups 2-3 CTAs per category using only categories that suit the content and platform, chosen from these headers: 💬 COMMENT, 📌 SAVE, 📤 SHARE, 👥 FOLLOW, 🔗 CLICK / VISIT, 🛒 BUY / CONVERT. Put each header on its own line followed by its CTAs.`,
   },
   hashtag: {
     id: "hashtag",

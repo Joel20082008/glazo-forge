@@ -25,7 +25,8 @@ const inputSchema = z.object({
   ctaGoal: z.string().max(40).optional(),
   revise: z
     .object({
-      action: z.enum(["regenerate", "shorten", "energetic", "style"]),
+      action: z.enum(["regenerate", "shorten", "energetic", "style", "expand", "tone"]),
+      targetTone: z.string().max(60).optional(),
       script: z.string().min(3).max(8000),
     })
     .optional(),
@@ -36,6 +37,8 @@ const REVISE_INSTRUCTIONS: Record<string, string> = {
   shorten: "Rewrite this script to be noticeably shorter and tighter (about 30 seconds), rewriting naturally rather than cutting sentences.",
   energetic: "Rewrite this script to be more energetic: punchier opening, faster pacing, stronger verbs.",
   style: "Rewrite this script in the requested script style while keeping the topic.",
+  expand: "Rewrite this to be fuller and more developed, adding context and detail naturally.",
+  tone: "Rewrite this in the target tone given below. The change in style must be clearly noticeable.",
 };
 
 export type GenerateResult =
@@ -104,12 +107,12 @@ export const generateContent = createServerFn({ method: "POST" })
         {
           role: "system",
           content: data.revise
-            ? `${tool.system}\n\nREVISION MODE: produce exactly ONE result block (no --- separators). ${REVISE_INSTRUCTIONS[data.revise.action]}`
+            ? `${tool.system}\n\nREVISION MODE: produce exactly ONE result block (no --- separators). ${REVISE_INSTRUCTIONS[data.revise.action]} Keep the same block label and the INTELLIGENCE lines (updated).${data.revise.targetTone ? ` Target tone: ${data.revise.targetTone}.` : ""}`
             : tool.system,
         },
         {
           role: "user",
-          content: `${details ? `${details}\n\n` : ""}Input:\n${data.input}${data.revise ? `\n\nScript to revise:\n${data.revise.script}` : ""}`,
+          content: `${details ? `${details}\n\n` : ""}Input:\n${data.input}${data.revise ? `\n\nContent to revise:\n${data.revise.script}` : ""}`,
         },
       ]);
 
