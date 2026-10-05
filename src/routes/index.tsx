@@ -1,8 +1,27 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { toast } from "sonner";
 
 import { BrandMark } from "@/components/brand-mark";
 import { GlowBackdrop } from "@/components/glow-backdrop";
-import { TOOL_LIST } from "@/lib/tools";
+import { PLAN_LIMITS, TOOL_LIST } from "@/lib/tools";
+
+const NGN = "\u20A6";
+
+const PLAN_CTA: Record<string, string> = {
+  free: "Get Started",
+  pro: "Upgrade to Pro",
+  premium: "Go Premium",
+};
+
+const PLAN_CARDS = Object.entries(PLAN_LIMITS).map(([id, plan]) => ({
+  id,
+  label: plan.label,
+  priceNgn: plan.priceNgn,
+  generations: plan.generations,
+  projects: plan.projects,
+  cta: PLAN_CTA[id] ?? "Get Started",
+  popular: id === "pro",
+}));
 
 export const Route = createFileRoute("/")({
   head: () => ({
