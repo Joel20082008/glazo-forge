@@ -4,6 +4,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/app-shell";
+import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { generateContent, type GenerateResult } from "@/lib/generate.functions";
 import { CAPTION_TONE_SHIFTS, CTA_GOALS, DURATIONS, HOOK_STYLES, PLATFORMS, SCRIPT_STYLES, TONES, TOOLS, type ToolId } from "@/lib/tools";
@@ -101,7 +102,7 @@ function ToolPage() {
         );
       } else toast.error(res.message);
     } catch {
-      toast.error("Could not update the script. Please try again.");
+      toast.error("Could not update the content. Please try again.");
     } finally {
       setRevising(null);
     }
@@ -277,7 +278,7 @@ function ToolPage() {
             {result.blocks.map((block, index) => {
               const hasIntel = tool.id === "script" || tool.id === "caption";
               const isCta = tool.id === "caption" && /^\s*CTA/i.test(block);
-              const copyText = hasIntel ? splitIntel(block).text : block;
+              const copyText = tool.id === "improve" ? splitImprovement(block).text : hasIntel ? splitIntel(block).text : block;
               return (
               <article
                 key={index}
@@ -287,7 +288,9 @@ function ToolPage() {
                 <p className="text-[11px] font-medium text-accent">
                   {tool.id === "hashtag" || tool.id === "caption" ? "Section" : "Variation"} {String(index + 1).padStart(2, "0")}
                 </p>
-                {hasIntel ? (
+                {tool.id === "improve" ? (
+                  <ImprovementBlock block={block} busy={revising === index} />
+                ) : hasIntel ? (
                   <IntelBlock block={block} busy={revising === index} kind={tool.id} />
                 ) : (
                   <p className="mt-2 text-sm leading-relaxed whitespace-pre-wrap">{block}</p>
@@ -321,6 +324,14 @@ function ToolPage() {
                     ) : null}
                   </>
                 ) : null}
+                {tool.id === "improve" ? (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <SmallButton disabled={revising !== null} onClick={() => revise(index, "regenerate")}>🔄 Regenerate</SmallButton>
+                    <SmallButton disabled={revising !== null} onClick={() => revise(index, "shorten")}>✂️ Make shorter</SmallButton>
+                    <SmallButton disabled={revising !== null} onClick={() => revise(index, "energetic")}>🔥 More energetic</SmallButton>
+                    <SmallButton disabled={revising !== null} onClick={() => revise(index, "tone", "emotional and heartfelt")}>❤️ More emotional</SmallButton>
+                  </div>
+                ) : null}
                 <div className="mt-3 flex flex-wrap gap-2">
                   <SmallButton
                     onClick={() => {
@@ -328,7 +339,7 @@ function ToolPage() {
                       toast.success("Copied");
                     }}
                   >
-                    {hasIntel ? "📋 Copy" : "Copy"}
+                    {hasIntel || tool.id === "improve" ? "📋 Copy" : "Copy"}
                   </SmallButton>
                   <SmallButton onClick={() => saveToLibrary(copyText)}>Save</SmallButton>
                   <SmallButton onClick={() => openInWorkspace(copyText)}>Open in workspace</SmallButton>
@@ -404,17 +415,73 @@ function Chips({
 function SmallButton({
   children,
   onClick,
+  disabled,
 }: {
   children: React.ReactNode;
   onClick: () => void;
+  disabled?: boolean;
 }) {
   return (
-    <button
+    <Button
+      type="button"
+      variant="outline"
+      size="sm"
       onClick={onClick}
-      className="rounded-lg border border-border bg-foreground/10 px-3 py-1.5 text-[12px] font-medium"
+      disabled={disabled}
+      className="h-auto min-h-8 whitespace-normal rounded-lg border-border bg-foreground/10 px-3 py-1.5 text-left text-[12px]"
     >
       {children}
-    </button>
+    </Button>
+  );
+}
+
+const REPORT_KEYS = ["Hook", "Clarity", "Structure", "CTA", "Overall Improvement"] as const;
+
+function splitImprovement(block: string) {
+  const reportStart = block.search(/^\s*IMPROVEMENT REPORT\s*$/im);
+  const changesStart = block.search(/^\s*EXPLAIN CHANGES\s*$/im);
+  const textEnd = reportStart >= 0 ? reportStart : changesStart >= 0 ? changesStart : block.length;
+  const text = block.slice(0, textEnd).trim().replace(/^IMPROVED VERSION\s*\n?/i, "").trim();
+  const report = reportStart >= 0
+    ? (block.slice(reportStart).split(/^\s*EXPLAIN CHANGES\s*$/im)[0] ?? "").replace(/^\s*IMPROVEMENT REPORT\s*$/im, "").trim()
+    : "";
+  const rows = REPORT_KEYS.map((key) => {
+    const line = report.split("\n").find((item) => item.trim().toLowerCase().startsWith(`${key.toLowerCase()}:`));
+    return line ? { key, value: line.slice(line.indexOf(":") + 1).trim() } : null;
+  }).filter((row): row is { key: typeof REPORT_KEYS[number]; value: string } => row !== null);
+  const changes = changesStart >= 0
+    ? block.slice(changesStart).replace(/^\s*EXPLAIN CHANGES\s*$/im, "").trim().split("\n").map((line) => line.replace(/^\s*[-•]\s*/, "").trim()).filter(Boolean).slice(0, 4)
+    : [];
+  return { text, rows, changes };
+}
+
+function ImprovementBlock({ block, busy }: { block: string; busy: boolean }) {
+  const { text, rows, changes } = splitImprovement(block);
+  return (
+    <div className={busy ? "animate-pulse opacity-60" : undefined} aria-busy={busy}>
+      <p className="mt-2 text-sm leading-relaxed whitespace-pre-wrap">{text}</p>
+      {rows.length > 0 ? (
+        <div className="mt-4 border-t border-border pt-3">
+          <h3 className="text-[11px] font-bold tracking-[0.1em] text-accent uppercase">Improvement report</h3>
+          <dl className="mt-2 grid gap-2 sm:grid-cols-2">
+            {rows.map(({ key, value }) => (
+              <div key={key} className={key === "Overall Improvement" ? "min-w-0 sm:col-span-2" : "min-w-0"}>
+                <dt className="text-[11px] text-muted-foreground">{key}</dt>
+                <dd className="text-xs leading-relaxed font-medium wrap-break-word">{value}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      ) : null}
+      {changes.length > 0 ? (
+        <div className="mt-4 border-t border-border pt-3">
+          <h3 className="text-[11px] font-bold tracking-[0.1em] text-accent uppercase">What changed</h3>
+          <ul className="mt-2 list-disc space-y-1 pl-5 text-xs leading-relaxed text-muted-foreground">
+            {changes.map((change, i) => <li key={i}>{change}</li>)}
+          </ul>
+        </div>
+      ) : null}
+    </div>
   );
 }
 
