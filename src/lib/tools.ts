@@ -233,9 +233,11 @@ Add 2–4 short bullet points under EXPLAIN CHANGES; no other sections. Preserve
 
 export const TOOL_LIST = Object.values(TOOLS);
 
-export const PLAN_LIMITS: Record<string, { generations: number; projects: number; label: string }> =
-  {
-    free: { generations: 25, projects: 10, label: "Free" },
-    pro: { generations: 500, projects: 200, label: "Pro" },
-    premium: { generations: 5000, projects: 2000, label: "Premium" },
-  };
+export const PLAN_LIMITS: Record<
+  string,
+  { generations: number; projects: number; label: string; priceNgn: number }
+> = {
+  free: { generations: 25, projects: 10, label: "Free", priceNgn: 0 },
+  pro: { generations: 500, projects: 200, label: "Pro", priceNgn: 4500 },
+  premium: { generations: 5000, projects: 2000, label: "Premium", priceNgn: 12000 },
+};
