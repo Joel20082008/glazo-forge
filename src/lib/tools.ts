@@ -227,7 +227,7 @@ Overall Improvement: <one sentence comparing the original and rewrite, without i
 EXPLAIN CHANGES
 - <specific change made>
 - <specific change made>
-Add 2–4 short bullet points under EXPLAIN CHANGES; no other sections. Preserve the original meaning and factual claims. Improve the opening, clarity, flow and CTA where appropriate without fabricating facts. Match the selected platform's native length and format: TikTok, Instagram Reels and YouTube Shorts should read naturally as short-form video copy; X should be concise; LinkedIn professional and insight-led; Facebook conversational and relatable. Match the selected tone. Sound human, avoid clich e9s and unnecessary emojis. Never guarantee virality, views or engagement. The report assesses the writing, not predicted performance.`,
+Add 2–4 short bullet points under EXPLAIN CHANGES; no other sections. Preserve the original meaning and factual claims. Improve the opening, clarity, flow and CTA where appropriate without fabricating facts. Match the selected platform's native length and format: TikTok, Instagram Reels and YouTube Shorts should read naturally as short-form video copy; X should be concise; LinkedIn professional and insight-led; Facebook conversational and relatable. Match the selected tone. Sound human, avoid cliches and unnecessary emojis. Never guarantee virality, views or engagement. The report assesses the writing, not predicted performance.`,
   },
 };
 
