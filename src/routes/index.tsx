@@ -83,25 +83,72 @@ function Landing() {
         </section>
 
         <section className="mt-10">
-          <div className="mb-3 flex items-center justify-between">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
             <h2 className="font-display text-sm font-semibold tracking-[0.14em] text-muted-foreground uppercase">
               Plans
             </h2>
             <span className="text-[11px] text-muted-foreground">Payments require configuration</span>
           </div>
           <div className="grid gap-3 sm:grid-cols-3">
-            {[
-              { name: "Free", gens: "25 generations / month", projects: "10 projects" },
-              { name: "Pro", gens: "500 generations / month", projects: "200 projects" },
-              { name: "Premium", gens: "5,000 generations / month", projects: "2,000 projects" },
-            ].map((plan) => (
-              <div key={plan.name} className="glass rounded-2xl p-4">
-                <p className="font-display text-base font-semibold">{plan.name}</p>
-                <p className="mt-2 text-[12px] text-muted-foreground">{plan.gens}</p>
-                <p className="text-[12px] text-muted-foreground">{plan.projects}</p>
+            {PLAN_CARDS.map((plan) => (
+              <div
+                key={plan.id}
+                className={`glass relative flex flex-col rounded-2xl p-4 ${
+                  plan.popular ? "ring-1 ring-accent/40" : ""
+                }`}
+              >
+                {plan.popular && (
+                  <span className="absolute -top-2 right-4 rounded-full border border-accent/40 bg-background px-2 py-0.5 text-[9px] font-semibold tracking-[0.12em] text-accent uppercase">
+                    Most popular
+                  </span>
+                )}
+                <p className="font-display text-base font-semibold">{plan.label}</p>
+                <p className="font-display mt-2 flex items-baseline gap-1.5 text-[28px] leading-none font-bold tracking-tight">
+                  <span>
+                    {NGN}
+                    {plan.priceNgn.toLocaleString("en-NG")}
+                  </span>
+                  <span className="text-[11px] font-medium text-muted-foreground">/ month</span>
+                </p>
+                <div className="mt-3 space-y-0.5">
+                  <p className="text-[12px] text-muted-foreground">
+                    {plan.generations.toLocaleString("en-NG")} generations / month
+                  </p>
+                  <p className="text-[12px] text-muted-foreground">
+                    {plan.projects.toLocaleString("en-NG")} projects
+                  </p>
+                </div>
+                {plan.id === "free" ? (
+                  <Link
+                    to="/auth"
+                    className="font-display mt-4 inline-flex w-full items-center justify-center rounded-xl bg-accent py-2.5 text-[13px] font-bold text-accent-foreground"
+                  >
+                    {plan.cta}
+                  </Link>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      toast.info(`${plan.label} plan`, {
+                        description:
+                          "Payments require configuration — this plan can't be purchased yet.",
+                      })
+                    }
+                    className={`font-display mt-4 inline-flex w-full items-center justify-center rounded-xl py-2.5 text-[13px] font-bold ${
+                      plan.popular
+                        ? "bg-accent text-accent-foreground"
+                        : "border border-border bg-foreground/5"
+                    }`}
+                  >
+                    {plan.cta}
+                  </button>
+                )}
               </div>
             ))}
           </div>
+          <p className="mt-3 text-center text-[11px] text-muted-foreground">
+            Monthly plans • Cancel anytime
+          </p>
         </section>
 
         <footer className="mt-12 flex items-center justify-between border-t border-border pt-5">
