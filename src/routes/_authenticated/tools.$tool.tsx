@@ -443,7 +443,7 @@ function splitImprovement(block: string) {
   const textEnd = reportStart >= 0 ? reportStart : changesStart >= 0 ? changesStart : block.length;
   const text = block.slice(0, textEnd).trim().replace(/^IMPROVED VERSION\s*\n?/i, "").trim();
   const report = reportStart >= 0
-    ? block.slice(reportStart).split(/^\s*EXPLAIN CHANGES\s*$/im)[0].replace(/^\s*IMPROVEMENT REPORT\s*$/im, "").trim()
+    ? (block.slice(reportStart).split(/^\s*EXPLAIN CHANGES\s*$/im)[0] ?? "").replace(/^\s*IMPROVEMENT REPORT\s*$/im, "").trim()
     : "";
   const rows = REPORT_KEYS.map((key) => {
     const line = report.split("\n").find((item) => item.trim().toLowerCase().startsWith(`${key.toLowerCase()}:`));
