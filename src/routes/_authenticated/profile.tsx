@@ -73,7 +73,8 @@ function Profile() {
     if (!auth.user) return;
     const { error } = await supabase
       .from("profiles")
-      .upsert({ id: auth.user.id, display_name: displayName, niche });
+      .update({ display_name: displayName, niche })
+      .eq("id", auth.user.id);
     if (error) toast.error("Could not save profile.");
     else {
       toast.success("Profile saved");
