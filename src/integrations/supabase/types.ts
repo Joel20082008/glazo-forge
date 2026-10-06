@@ -35,27 +35,75 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          payload: Json
+          plan: string | null
+          provider: string
+          provider_reference: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          payload: Json
+          plan?: string | null
+          provider: string
+          provider_reference: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          payload?: Json
+          plan?: string | null
+          provider?: string
+          provider_reference?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
           display_name: string | null
           id: string
           niche: string | null
+          payment_customer_ref: string | null
+          payment_provider: string | null
           plan: string
+          subscription_renews_at: string | null
+          subscription_started_at: string | null
+          subscription_status: string
         }
         Insert: {
           created_at?: string
           display_name?: string | null
           id: string
           niche?: string | null
+          payment_customer_ref?: string | null
+          payment_provider?: string | null
           plan?: string
+          subscription_renews_at?: string | null
+          subscription_started_at?: string | null
+          subscription_status?: string
         }
         Update: {
           created_at?: string
           display_name?: string | null
           id?: string
           niche?: string | null
+          payment_customer_ref?: string | null
+          payment_provider?: string | null
           plan?: string
+          subscription_renews_at?: string | null
+          subscription_started_at?: string | null
+          subscription_status?: string
         }
         Relationships: []
       }
@@ -184,6 +232,54 @@ export type Database = {
         }
         Relationships: []
       }
+      video_generations: {
+        Row: {
+          aspect_ratio: string
+          created_at: string
+          duration_seconds: number
+          error: string | null
+          has_image: boolean
+          id: string
+          job_id: string | null
+          progress: number | null
+          prompt: string
+          status: string
+          storage_path: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          aspect_ratio: string
+          created_at?: string
+          duration_seconds: number
+          error?: string | null
+          has_image?: boolean
+          id?: string
+          job_id?: string | null
+          progress?: number | null
+          prompt: string
+          status?: string
+          storage_path?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          aspect_ratio?: string
+          created_at?: string
+          duration_seconds?: number
+          error?: string | null
+          has_image?: boolean
+          id?: string
+          job_id?: string | null
+          progress?: number | null
+          prompt?: string
+          status?: string
+          storage_path?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -196,6 +292,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      plan_project_limit: { Args: { _plan: string }; Returns: number }
     }
     Enums: {
       app_role: "admin" | "user"
