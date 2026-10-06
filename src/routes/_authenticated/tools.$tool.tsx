@@ -159,6 +159,12 @@ function ToolPage() {
       .select("id")
       .single();
     if (error || !data) {
+      if (error?.message.includes("PROJECT_LIMIT_REACHED")) {
+        toast.error("Project limit reached", {
+          description: "You've used all projects on your plan. Upgrade or delete a project to continue.",
+        });
+        return;
+      }
       toast.error("Could not create the project.");
       return;
     }

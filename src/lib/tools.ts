@@ -235,9 +235,9 @@ export const TOOL_LIST = Object.values(TOOLS);
 
 export const PLAN_LIMITS: Record<
   string,
-  { generations: number; projects: number; label: string; priceNgn: number }
+  { generations: number; projects: number; videos: number; label: string; priceNgn: number }
 > = {
-  free: { generations: 25, projects: 10, label: "Free", priceNgn: 0 },
-  pro: { generations: 500, projects: 200, label: "Pro", priceNgn: 4500 },
-  premium: { generations: 5000, projects: 2000, label: "Premium", priceNgn: 12000 },
+  free: { generations: 25, projects: 10, videos: 2, label: "Free", priceNgn: 0 },
+  pro: { generations: 500, projects: 200, videos: 20, label: "Pro", priceNgn: 4500 },
+  premium: { generations: 5000, projects: 2000, videos: 100, label: "Premium", priceNgn: 12000 },
 };
