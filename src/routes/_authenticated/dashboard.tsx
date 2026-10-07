@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 
 import { AppShell } from "@/components/app-shell";
+import { UsageCard } from "@/components/usage-card";
 import { supabase } from "@/integrations/supabase/client";
 import { PLAN_LIMITS, TOOL_LIST } from "@/lib/tools";
 
@@ -104,6 +105,8 @@ function Dashboard() {
         </div>
       </section>
 
+      <UsageCard />
+
       <section className="mt-7">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="font-display text-sm font-semibold tracking-[0.14em] text-muted-foreground uppercase">
@@ -126,6 +129,14 @@ function Dashboard() {
               <p className="mt-1 text-[11px] leading-snug text-muted-foreground">{tool.tagline}</p>
             </Link>
           ))}
+          <Link
+            to="/video"
+            className="glass rounded-2xl p-4 transition-transform hover:-translate-y-0.5"
+          >
+            <div className="grid size-9 place-items-center rounded-lg bg-accent/15 text-accent">🎥</div>
+            <p className="font-display mt-3 text-sm font-semibold">AI Video Generator</p>
+            <p className="mt-1 text-[11px] leading-snug text-muted-foreground">Text or image to video</p>
+          </Link>
         </div>
       </section>
 

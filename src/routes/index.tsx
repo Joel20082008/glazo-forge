@@ -19,6 +19,7 @@ const PLAN_CARDS = Object.entries(PLAN_LIMITS).map(([id, plan]) => ({
   priceNgn: plan.priceNgn,
   generations: plan.generations,
   projects: plan.projects,
+  videos: plan.videos,
   cta: PLAN_CTA[id] ?? "Get Started",
   popular: id === "pro",
 }));
@@ -135,6 +136,9 @@ function Landing() {
                   </p>
                   <p className="text-[12px] text-muted-foreground">
                     {plan.projects.toLocaleString("en-NG")} projects
+                  </p>
+                  <p className="text-[12px] text-muted-foreground">
+                    {plan.videos.toLocaleString("en-NG")} AI videos / month
                   </p>
                 </div>
                 {plan.id === "free" ? (
